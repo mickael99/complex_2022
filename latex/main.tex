@@ -1,0 +1,129 @@
+\documentclass[a4paper, 10pt]{article}
+\usepackage{arev}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage[a4paper, portrait, margin=2.0cm]{geometry}
+
+\usepackage{graphicx}
+\graphicspath{{./images/}}
+
+\usepackage{pdfpages}
+\usepackage{sectsty}
+\usepackage[french]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{fancyhdr}
+\usepackage{datetime}
+\usepackage{multicol}
+\usepackage[hyphens]{url}
+\usepackage{longtable}
+\usepackage[framemethod=tikz]{mdframed}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{microtype}
+\usepackage{mathtools}
+
+
+\usepackage{footnote}
+\makesavenoteenv{tabular}
+
+\usepackage[backend=bibtex, style=numeric]{biblatex}
+\bibliography{biblio.bib}
+
+
+\lstset{language=C++,
+        basicstyle=\ttfamily,
+        keywordstyle=\color{blue}\ttfamily,
+        stringstyle=\color{red}\ttfamily,
+        commentstyle=\color{green}\ttfamily,
+        morecomment=[l][\color{magenta}]{\#},
+        numbers=left,
+        gobble=4,
+        tabsize=4,
+        frame=single
+}
+
+\usepackage[ruled,vlined,longend,french,onelanguage]{algorithm2e}
+
+
+% Configure l'environnement PDF
+
+\usepackage[pdfauthor = {{Mickaël Temim et Mathieu}}, pdftitle = {{Coupe minimale d'un graphe}}, pdfstartview = Fit, pdfpagelayout = SinglePage, pdfnewwindow = true, bookmarksnumbered = true,
+breaklinks, colorlinks, linkcolor = red, urlcolor = black,
+citecolor = cyan, linktoc = all]{hyperref}
+
+% Configure la numérotation des parties
+
+\renewcommand{\thepart}{\Roman{part}}
+\renewcommand{\thesection}{\arabic{section}}
+
+% Couleurs personnalisées
+
+\definecolor{mainpink}{RGB}{184, 117, 172}
+\definecolor{darkgreen}{rgb}{0.31, 0.47, 0.26}
+
+% Configure le header et le footer
+
+\fancypagestyle{myheader} {
+	\fancyhf{}
+	\fancyhead[l]{Coupe minimale d'un graphe}
+	\fancyhead[r]{Sorbonne - \today}
+	\fancyfoot[r]{Page \thepage}
+	\renewcommand{\headrulewidth}{2pt}
+	\renewcommand{\headrule}{\hbox to \headwidth{
+	\color{mainpink}\leaders\hrule height \headrulewidth\hfill}}
+	\renewcommand{\footrulewidth}{2pt}
+	\renewcommand{\footrule}{\hbox to \headwidth{
+	\color{mainpink}\leaders\hrule height \headrulewidth\hfill}}
+}
+\setlength{\headheight}{21pt}
+
+\chardef\_=`_
+\chardef\&=`&
+
+% Configure les mdframe
+
+\mdfsetup{
+  linewidth=.5bp,
+  innerleftmargin=3bp,
+  innerrightmargin=3bp,
+  innertopmargin=3bp,
+  innerbottommargin=3bp,
+}
+
+% Configure la séparation des colonnes 
+
+\setlength{\columnsep}{0.8cm}
+
+% Configure la couleur des headers
+
+\partfont{\color{mainpink}}
+
+\begin{document}
+\pagestyle{myheader}
+
+\input{titlepage}
+
+\newpage
+
+\setcounter{page}{2}
+{
+	\hypersetup{hidelinks}
+	\renewcommand{\contentsname}{Sommaire}
+
+	\tableofcontents
+}
+
+\cleardoublepage
+
+\include{ex_1.tex}
+\include{ex_2.tex}
+\include{ex_3.tex}
+
+\nocite{*}
+
+\printbibliography
+
+\end{document}

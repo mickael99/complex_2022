@@ -1,9 +1,3 @@
-"""
-
-    ALGORITHME DE KARGER SUR DES GRAPHES REPRESENTES PAR UNE MATRICE D'ADJACENCE
-
-"""
-
 from random import random
 from random import randint
 
@@ -93,7 +87,6 @@ class Graphe:
                     c += 1
 
 """
-
     CREATION DE GRAPHE
     
 """
@@ -135,13 +128,13 @@ def create_cyclic_graph(length):
     return(Graphe) -> Le graphe résultant
 """
 def create_complete_graph(length):
-     matrix = create_matrix(length)
+    matrix = create_matrix(length)
 
-     for i in range(length):
-         for j in range(length):
-             if i != j:
-                 matrix[i][j] = 1
-     return Graphe(matrix)
+    for i in range(length):
+        for j in range(length):
+            if i != j:
+                matrix[i][j] = 1
+    return Graphe(matrix)
 
 """
     Créer un graphe bipartie complet de taille 'length'
@@ -173,10 +166,9 @@ def create_random_graph(length, probability):
     matrix = create_matrix(length)
 
     for i in range(length):
-        for j in range(i, length):
+        for j in range(length):
             if i != j and random() < probability:
                 matrix[i][j] = 1
-                matrix[j][i] = 1
     return Graphe(matrix)
 
 """
@@ -214,9 +206,7 @@ def karger(g):
 
 
 """
-
     FONCTIONS DE TESTES
-
 """
 def test_contraction():
     cyclic_graph = create_cyclic_graph(5)

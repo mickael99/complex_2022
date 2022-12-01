@@ -1,0 +1,2 @@
+-complexité contraction sur les differentes familles de graphes
+-complexité karger sur les differentes familles de graphes + comparaison avec compléxité du cours

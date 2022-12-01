@@ -1,3 +1,9 @@
+"""
+
+    ALGORITHME DE KARGER SUR DES GRAPHES REPRESENTES PAR UNE MATRICE D'ADJACENCE
+
+"""
+
 from random import random
 from random import randint
 
@@ -167,9 +173,10 @@ def create_random_graph(length, probability):
     matrix = create_matrix(length)
 
     for i in range(length):
-        for j in range(length):
+        for j in range(i, length):
             if i != j and random() < probability:
                 matrix[i][j] = 1
+                matrix[j][i] = 1
     return Graphe(matrix)
 
 """

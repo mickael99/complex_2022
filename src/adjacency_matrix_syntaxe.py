@@ -41,7 +41,6 @@ class Graphe:
         #fusionnage des arrêtes
         for i in range(length):
             self.matrix[a][i] += self.matrix[b][i]
-        for i in range(length):
             self.matrix[i][a] += self.matrix[i][b]
         self.matrix[a][a] = 0
 

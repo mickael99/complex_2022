@@ -1,5 +1,7 @@
 from random import random
 from random import randint
+from math import sqrt
+from copy import deepcopy
 
 """
     Exception qui se lance lorsqu'on cherche un identifiant d'une arête qui n'existe pas dans le graphe
@@ -41,6 +43,7 @@ class Graphe:
         #fusionnage des arrêtes
         for i in range(length):
             self.matrix[a][i] += self.matrix[b][i]
+        for i in range(length):
             self.matrix[i][a] += self.matrix[i][b]
         self.matrix[a][a] = 0
 
@@ -48,6 +51,30 @@ class Graphe:
         self.matrix.pop(b)
         for  i in range(length - 1):
             self.matrix[i].pop(b)
+
+    """
+        Réalise la contraction partielle d'un graphe
+            
+        g(Graphe) -> Le graphe
+        t(int) -> nombre max de sommets du graphe à la sortie de la fonction
+        nb_vertex(int) -> nombre de sommets du graphe
+        nb_edges(int) -> nombre d'arêtes du graphe
+            
+        return(int) -> le nombre d'arêtes du graphe
+    """
+    def partial_contraction(self, t, nb_vertex, nb_edges):
+        while(nb_vertex > t):
+            #selection d'une arête aléatoire
+            id_edges = randint(0, nb_edges - 1)
+            e = self.get_edges_from_id(id_edges)
+            a, b = e
+            #contraction de l'arête
+            remove_edges = self.matrix[a][b] #nombres d'aretes qui seront supprimés du graphe
+            self.contraction(e)
+            #mise à jour du nombre de sommet et du nombre d'arête du graphe
+            nb_edges -= remove_edges
+            nb_vertex -= 1
+        return nb_edges
 
     """
         Renvoie le nombre de sommets dans le graphe
@@ -171,9 +198,15 @@ def create_random_graph(length, probability):
     return Graphe(matrix)
 
 """
+
+    FONCTIONS DE KARGER
+
+"""
+
+"""
     Réalise l'algorithme de karger à partir d'un graphe 
     
-    g -> Le graphe 
+    g(Graphe) -> Le graphe 
     
     return(list, int) -> tuple (liste des sommets de v1, la valeur de la coupe minimale)
 """
@@ -187,8 +220,7 @@ def karger(g):
         #contraction
         id_edges = randint(0, nb_edges - 1)
         e = g.get_edges_from_id(id_edges)
-        a = e[0]
-        b = e[1]
+        a, b = e
         remove_edges = g.matrix[a][b] #nombres d'aretes qui seront supprimés du graphe
         g.contraction(e)
 
@@ -205,7 +237,79 @@ def karger(g):
 
 
 """
+   Réalise l'algorithme de karger T fois
+   
+   g(Graphe) -> Le graphe 
+   T(int) -> Le nombre d'itération
+   
+   return(list, int) -> tuple (liste des sommets de v1, la valeur de la coupe minimale)
+"""
+def iterated_karger(g, t):
+    total_min_cut_size = -1
+    min_cut_size = []
+
+    for i in range(t):
+        tmp_min_cut_size, nb_edges = karger(deepcopy(g))
+        if total_min_cut_size == -1 or (nb_edges < total_min_cut_size):
+            total_min_cut_size = nb_edges
+            min_cut_size = tmp_min_cut_size
+
+    return(min_cut_size,total_min_cut_size)
+
+
+"""
+   Réalise l'algorithme de karger Stein
+   
+   g(Graphe) -> Le graphe 
+   nb_vertex(int) -> le nombre de sommet du graphe
+   nb_edges(int) -> le nombre d'arête du graphe
+   
+   return(list, int) -> tuple (liste des sommets de v1, la valeur de la coupe minimale)
+"""
+def karger_stein(g,nb_vertex,nb_edges):
+    if(nb_vertex <= 6):
+        merged_vertex, min_cut_size = karger(g)
+        return (merged_vertex, min_cut_size)
+
+    # t = 1+ #V/sqrt(2)
+    t = int((1 + nb_vertex / sqrt(2)) + 0.99)
+
+    #création de g1
+    g1 = deepcopy(g)
+    nb_vertex_g1 = nb_vertex
+    nb_edges_g1 = nb_edges
+
+    #g1 = contraction_partielle(g, t)
+    g1.partial_contraction(t, nb_vertex_g1, nb_edges_g1)
+    nb_vertex_g1 = g1.get_nb_vertex()
+    nb_edges_g1 = g1.get_nb_edges()
+
+    #s1, m1 = kargerStein(g1)
+    s1, m1 = karger_stein(g1, nb_vertex_g1, nb_edges_g1)
+
+    #création de g2
+    g2 = deepcopy(g)
+    nb_vertex_g2 = nb_vertex
+    nb_edges_g2 = nb_edges
+
+    #g2 = contraction_partielle(g, t)
+    g2.partial_contraction(t, nb_vertex_g2, nb_edges_g2)
+    nb_vertex_g2 = g2.get_nb_vertex()
+    nb_edges_g2 = g2.get_nb_edges()
+
+    #s2, m2 = kargerStein(g2)
+    s2, m2 = karger_stein(g2, nb_vertex_g2, nb_edges_g2)
+
+    #test sur les valeurs de m1 et m2
+    if m1 < m2:
+        return (s1, m1)
+    else:
+        return (s2, m2)
+
+"""
+
     FONCTIONS DE TESTES
+    
 """
 def test_contraction():
     cyclic_graph = create_cyclic_graph(5)
@@ -221,6 +325,7 @@ def test_contraction():
         assert cyclic_graph.matrix == [[0, 1, 0, 1], [1, 0, 1, 0], [0, 1, 0, 1], [1, 0, 1, 0]]
         assert complete_graph.matrix == [[0, 2, 1], [2, 0, 2], [1, 2, 0]]
         assert complete_bipartie_graphe.matrix == [[0, 1, 1, 1, 1], [1, 0, 0, 1, 1], [1, 0, 0, 1, 1], [1, 1, 1, 0, 0], [1, 1, 1, 0, 0]]
+        print("La contraction fonctionne\n")
     except AssertionError:
         print("Probleme avec la fonction de contraction")
 
@@ -231,9 +336,31 @@ def test_karger():
     l, e = karger(cyclic_graph)
     try:
         assert e == 2
+        print("L'algorithme de karger fonctionne\n")
     except AssertionError:
         print("Probleme avec la fonction de karger")
 
+def test_iterated_karger():
+    complete_graphe = create_complete_graph(50)
+    l, e = iterated_karger(complete_graphe, 100)
+    try:
+        assert e == 49
+        print("L'algorithme de karger itere fonctionne\n")
+    except AssertionError:
+        print("Probleme avec la fonction de iterated_karger")
+
+def test_karger_stein():
+    complete_graphe = create_complete_graph(200)
+    l, e = karger_stein(complete_graphe, complete_graphe.get_nb_vertex(), complete_graphe.get_nb_edges())
+    try:
+        assert e == 199
+        print("L'algorithme de karger stein fonctionne\n")
+    except AssertionError:
+        print("Probleme avec la fonction de iterated_karger")
+
 if __name__ == "__main__":
+    print("\n")
     test_contraction()
     test_karger()
+    test_iterated_karger()
+    test_karger_stein()
